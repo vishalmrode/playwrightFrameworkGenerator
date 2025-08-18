@@ -1,0 +1,12 @@
+* text=auto
+
+*.ts linguist-language=TypeScript text
+*.tsx linguist-language=TypeScript text
+*.js linguist-language=JavaScript text
+*.jsx linguist-language=JavaScript text
+*.json linguist-language=JSON text
+*.html linguist-language=HTML text
+*.css linguist-language=CSS text
+*.md linguist-language=Markdown text
+*.yml linguist-language=YAML text
+*.yaml linguist-language=YAML text
