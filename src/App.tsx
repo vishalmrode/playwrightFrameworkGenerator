@@ -30,7 +30,7 @@ export default function App() {
     <ReduxProvider store={store}>
       <ThemeProvider>
         <TooltipProvider delayDuration={200}>
-          <BrowserRouter>
+          <BrowserRouter basename="/playwrightFrameworkGenerator">
             <Header />
             <div className="min-h-screen bg-background">
               <AppRoutes />
@@ -42,4 +42,3 @@ export default function App() {
     </ReduxProvider>
   );
 }
-
