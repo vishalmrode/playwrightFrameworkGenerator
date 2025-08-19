@@ -19,6 +19,6 @@ test('debug package json integrations', () => {
     ui: { theme: 'light' }
   };
   const pkg = generatePackageJson(state as any);
-  // eslint-disable-next-line no-console
+   
   console.log(JSON.stringify(pkg, null, 2));
 });

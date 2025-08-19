@@ -95,7 +95,7 @@ const GenerateButton = () => {
 
   // Debug information to help diagnose disabled/non-clickable button issues in the browser
   // Leave logs minimal and helpful; can be removed after debugging
-  // eslint-disable-next-line no-console
+   
   console.debug('[GenerateButton] selectedBrowsersList=', selectedBrowsersList, 'canGenerate=', canGenerate, 'isGenerating=', isGenerating);
 
   const handleGenerate = async () => {
