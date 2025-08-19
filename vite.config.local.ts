@@ -4,9 +4,10 @@ import path, { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/playwrightFrameworkGenerator/',
+  // Commented out base path for local testing
+  // base: '/playwrightFrameworkGenerator/',
   build: {
-    outDir: 'build'
+    outDir: 'build-local'
   },
   plugins: [react()],
   resolve: {
