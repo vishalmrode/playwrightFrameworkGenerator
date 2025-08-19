@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --base=/playwrightFrameworkGenerator/",
     "generate:manual:pdf": "node ./scripts/generate_manual_pdf.js",
     "type-check": "tsc",
     "preview": "vite preview",
@@ -94,3 +94,4 @@
     "vitest": "^3.2.4"
   }
 }
+
