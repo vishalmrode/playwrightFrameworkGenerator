@@ -201,7 +201,7 @@ function generatePackageJson(config: PreviewConfiguration): ProjectFile {
 
   const content = `{
   "name": "playwright-framework",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Generated Playwright testing framework",
   "main": "index.js",
   "scripts": {

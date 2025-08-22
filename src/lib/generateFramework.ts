@@ -8,7 +8,6 @@
 import { getLanguageExtension } from '@/lib/SelectProgrammingLanguage';
 import type { CIPipelineState } from '@/types/ciPipeline';
 import JSZip from 'jszip';
-
 export interface GenerationProgress {
   progress: number;
   message: string;
