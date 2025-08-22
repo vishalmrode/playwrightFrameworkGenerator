@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -6,24 +7,31 @@ import { Chrome, Globe, Monitor, CheckCircle2, XCircle } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/hooks/redux";
 import { toggleBrowser, selectAllBrowsers, deselectAllBrowsers } from "@/store/slices/browserSlice";
 
-export function BrowserConfiguration() {
+export const BrowserConfiguration = React.memo(() => {
   const dispatch = useAppDispatch();
   const { selectedBrowsers } = useAppSelector(state => state.browser);
 
-  const handleBrowserToggle = (browser: 'chromium' | 'firefox' | 'webkit') => {
+  const handleBrowserToggle = React.useCallback((browser: "chromium" | "firefox" | "webkit") => {
     dispatch(toggleBrowser(browser));
-  };
+  }, [dispatch]);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = React.useCallback(() => {
     dispatch(selectAllBrowsers());
-  };
+  }, [dispatch]);
 
-  const handleDeselectAll = () => {
+  const handleDeselectAll = React.useCallback(() => {
     dispatch(deselectAllBrowsers());
-  };
+  }, [dispatch]);
 
-  const allSelected = Object.values(selectedBrowsers).every(selected => selected);
-  const noneSelected = Object.values(selectedBrowsers).every(selected => !selected);
+  const allSelected = React.useMemo(
+    () => Object.values(selectedBrowsers).every(selected => selected),
+    [selectedBrowsers]
+  );
+  
+  const noneSelected = React.useMemo(
+    () => Object.values(selectedBrowsers).every(selected => !selected),
+    [selectedBrowsers]
+  );
 
   return (
     <Card data-testid="browser-configuration">
@@ -127,6 +135,8 @@ export function BrowserConfiguration() {
       </CardContent>
     </Card>
   );
-}
+});
+
+BrowserConfiguration.displayName = 'BrowserConfiguration';
 
 export default BrowserConfiguration;

@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -11,13 +12,16 @@ import { LANGUAGE_OPTIONS, ProgrammingLanguage } from "@/types/language";
  * for their generated Playwright framework. The selection affects all generated files,
  * configurations, and examples throughout the application.
  */
-export function LanguageSelector() {
+export const LanguageSelector = React.memo(() => {
   const dispatch = useAppDispatch();
   const selectedLanguage = useAppSelector((state) => state.language.selectedLanguage);
 
-  const handleLanguageChange = (value: string) => {
-    dispatch(setSelectedLanguage(value as ProgrammingLanguage));
-  };
+  const handleLanguageChange = React.useCallback(
+    (value: string) => {
+      dispatch(setSelectedLanguage(value as ProgrammingLanguage));
+    },
+    [dispatch]
+  );
 
   return (
     <Card data-testid="language-selector">
@@ -25,17 +29,17 @@ export function LanguageSelector() {
         <CardTitle>Programming Language</CardTitle>
       </CardHeader>
       <CardContent>
-        <RadioGroup 
-          value={selectedLanguage} 
+        <RadioGroup
+          value={selectedLanguage}
           onValueChange={handleLanguageChange}
           data-testid="language-options"
         >
           {LANGUAGE_OPTIONS.map((option) => (
             <div key={option.value} className="flex items-center space-x-2">
-              <RadioGroupItem 
-                value={option.value} 
-                id={option.value} 
-                data-testid={`${option.value}-option`} 
+              <RadioGroupItem
+                value={option.value}
+                id={option.value}
+                data-testid={`${option.value}-option`}
               />
               <Label htmlFor={option.value} className="flex flex-col flex-1">
                 <div className="flex items-center gap-2">
@@ -54,6 +58,8 @@ export function LanguageSelector() {
       </CardContent>
     </Card>
   );
-}
+});
+
+LanguageSelector.displayName = "LanguageSelector";
 
 export default LanguageSelector;

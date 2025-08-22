@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { store } from './store';
 import ThemeProvider from './ThemeProvider';
 import Header from './components/Header';
+import ErrorBoundary from './components/ErrorBoundary';  // Add this line
 import { Suspense } from 'react';
 import { useRoutes } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
@@ -27,18 +28,22 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ReduxProvider store={store}>
-      <ThemeProvider>
-        <TooltipProvider delayDuration={200}>
-          <BrowserRouter basename="/playwrightFrameworkGenerator">
-            <Header />
-            <div className="min-h-screen bg-background">
-              <AppRoutes />
-            </div>
-          </BrowserRouter>
-          <Toaster />
-        </TooltipProvider>
-      </ThemeProvider>
-    </ReduxProvider>
+    <ErrorBoundary>
+      <ReduxProvider store={store}>
+        <ThemeProvider>
+          <TooltipProvider delayDuration={200}>
+            <BrowserRouter basename="/playwrightFrameworkGenerator">
+              <Header />
+              <div className="min-h-screen bg-background">
+                <ErrorBoundary>
+                  <AppRoutes />
+                </ErrorBoundary>
+              </div>
+            </BrowserRouter>
+            <Toaster />
+          </TooltipProvider>
+        </ThemeProvider>
+      </ReduxProvider>
+    </ErrorBoundary>
   );
 }

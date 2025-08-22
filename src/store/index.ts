@@ -23,7 +23,19 @@ export const store = configureStore({
     codeQuality: codeQualityReducer,
     ciPipeline: ciPipelineReducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+  middleware: (getDefaultMiddleware) => 
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore action types and paths that contain non-serializable values
+        ignoredActionPaths: ['meta.arg', 'payload.timestamp'],
+        ignoredStatePaths: ['socket.connection']
+      },
+      immutableCheck: {
+        // Ignore state paths that might contain non-serializable values
+        ignoredPaths: ['socket.connection']
+      }
+    }),
+  devTools: process.env.NODE_ENV !== 'production'
 });
 
 export type RootState = ReturnType<typeof store.getState>;
