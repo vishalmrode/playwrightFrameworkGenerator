@@ -6,7 +6,7 @@
  * simple and free of runtime side-effects; consumers call `generateFramework`.
  */
 import { getLanguageExtension } from '@/lib/SelectProgrammingLanguage';
-import type { CIPipelineState } from '@/types/ciPipeline';
+import type { CIPipelineState, WorkflowConfig } from '@/types/ciPipeline';
 import JSZip from 'jszip';
 export interface GenerationProgress {
   progress: number;
@@ -61,14 +61,24 @@ export async function generateFramework(state: GenerateState, onProgress: (progr
   await generateTestExamples(zip, state);
   onProgress({ progress: 50, message: 'Test examples generated' });
 
+    // Always generate the three default workflow files
     if (state.ciPipeline?.enabled) {
       zip.file('.github/workflows/playwright.yml', generateGithubWorkflow(state));
-      // Emit PR checks and nightly workflow files by default when CI is enabled.
-      // Tests expect these files to exist when CI is true.
       zip.file('.github/workflows/pr-checks.yml', generateGithubPrChecks(state.ciPipeline.workflows?.[0] || {}));
       zip.file('.github/workflows/nightly.yml', generateGithubNightly(state.ciPipeline.workflows?.[1] || {}));
-      // optional additional workflows could be added here
-      onProgress({ progress: 60, message: 'CI workflow generated' });
+      // Generate a .yml file for each custom workflow, skipping the three defaults
+      if (Array.isArray(state.ciPipeline.workflows)) {
+        const defaultNames = ['playwright', 'pr-checks', 'nightly'];
+        for (const workflow of state.ciPipeline.workflows) {
+          if (workflow && workflow.name) {
+            const sanitized = workflow.name.replace(/[^a-z0-9-_\\.]/gi, '-').toLowerCase();
+            if (!defaultNames.includes(sanitized.replace(/\\.yml$/, ''))) {
+              zip.file(`.github/workflows/${sanitized}.yml`, generateWorkflowContent(workflow));
+            }
+          }
+        }
+      }
+      onProgress({ progress: 60, message: 'CI workflows generated' });
     }
 
     if (state.docker?.enabled) {
@@ -551,31 +561,6 @@ function generateDockerignore() {
   return ['node_modules', 'playwright-report', 'dist', '.env'].join('\n');
 }
 
-function generateGithubWorkflow(_state: GenerateState) {
-  return [
-    'name: Playwright Tests',
-    'on: [push, pull_request]',
-    'jobs:',
-    '  test:',
-    '    runs-on: ubuntu-latest',
-    '    steps:',
-    "      - uses: actions/checkout@v3",
-    "      - uses: actions/setup-node@v3",
-    "        with:",
-    "          node-version: '20'",
-    '      - run: npm ci',
-    '      - run: npx playwright install --with-deps',
-    '      - run: npm test'
-  ].join('\n');
-}
-
-function generateGithubPrChecks(_workflow: any) {
-  return ['name: PR Checks', 'on: [pull_request]', 'jobs:', '  build:', '    runs-on: ubuntu-latest', '    steps:', "      - uses: actions/checkout@v3", "      - run: npm ci", "      - run: npm test"].join('\n');
-}
-
-function generateGithubNightly(_workflow: any) {
-  return ['name: Nightly Tests', 'on: schedule', 'jobs:', '  nightly:', '    runs-on: ubuntu-latest', '    steps:', "      - uses: actions/checkout@v3", "      - run: npm ci", "      - run: npm test"].join('\n');
-}
 
 function generateDockerComposeDev() { return 'version: "3.8"\nservices:\n  playwright-tests: {}'; }
 function generateDockerComposeTest() { return 'version: "3.8"\nservices:\n  playwright-tests: {}'; }
@@ -595,6 +580,45 @@ function generateWCAGTestExample(_state: GenerateState) { return "import { test,
 function generatePerformanceTestExample(_state: GenerateState) { return "import { test, expect } from '@playwright/test';\n"; }
 function generateLighthouseTestExample(_state: GenerateState) { return "import { test, expect } from '@playwright/test';\n"; }
 
+function generateWorkflowContent(workflow: any) {
+  // Basic fallback if no structure is provided
+  if (!workflow || !workflow.name) {
+    return 'name: Workflow\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - run: npm ci\n      - run: npm test';
+  }
+  // Example: You can expand this to use workflow.triggers, workflow.jobs, etc.
+  let triggers = 'on: [push]';
+  if (workflow.triggers && Array.isArray(workflow.triggers) && workflow.triggers.length > 0) {
+    triggers = 'on: [' + workflow.triggers.join(', ') + ']';
+  }
+  let jobs = '';
+  if (workflow.jobs && typeof workflow.jobs === 'object') {
+    for (const [jobName, job] of Object.entries(workflow.jobs)) {
+      const typedJob = job as { [key: string]: any };
+      jobs += `  ${jobName}:\n    runs-on: ${typedJob["runs-on"] || 'ubuntu-latest'}\n    steps:\n`;
+      if (Array.isArray(typedJob.steps)) {
+        for (const step of typedJob.steps) {
+          if (step.uses) {
+            jobs += `      - uses: ${step.uses}`;
+            if (step.with) {
+              jobs += '\n        with:';
+              for (const [k, v] of Object.entries(step.with)) {
+                jobs += `\n          ${k}: ${v}`;
+              }
+            }
+            jobs += '\n';
+          } else if (step.run) {
+            jobs += `      - run: ${step.run}\n`;
+          }
+        }
+      }
+    }
+  } else {
+    // Default job if none provided
+    jobs = '  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - run: npm ci\n      - run: npm test\n';
+  }
+  return `name: ${workflow.name}\n${triggers}\njobs:\n${jobs}`;
+}
+
 // Exported for tests (keeps file shape similar)
 export {
   generatePackageJson,
@@ -603,3 +627,54 @@ export {
   generateTestExamples,
   generateEnvExampleForName
 };
+
+/**
+ * Generates a basic GitHub Actions workflow YAML for Playwright tests.
+ * This is always included as .github/workflows/playwright.yml.
+ */
+function generateGithubWorkflow(_state: any) {
+  return [
+    'name: Playwright Tests',
+    'on: [push, pull_request]',
+    'jobs:',
+    '  test:',
+    '    runs-on: ubuntu-latest',
+    '    steps:',
+    "      - uses: actions/checkout@v3",
+    "      - uses: actions/setup-node@v3",
+    "        with:",
+    "          node-version: '20'",
+    '      - run: npm ci',
+    '      - run: npx playwright install --with-deps',
+    '      - run: npm test'
+  ].join('\n');
+}
+
+function generateGithubPrChecks(_workflow: any) {
+  return [
+    'name: PR Checks',
+    'on: [pull_request]',
+    'jobs:',
+    '  build:',
+    '    runs-on: ubuntu-latest',
+    '    steps:',
+    "      - uses: actions/checkout@v3",
+    "      - run: npm ci",
+    "      - run: npm test"
+  ].join('\n');
+}
+
+function generateGithubNightly(_workflow: any) {
+  return [
+    'name: Nightly Tests',
+    'on: schedule',
+    'jobs:',
+    '  nightly:',
+    '    runs-on: ubuntu-latest',
+    '    steps:',
+    "      - uses: actions/checkout@v3",
+    "      - run: npm ci",
+    "      - run: npm test"
+  ].join('\n');
+}
+
