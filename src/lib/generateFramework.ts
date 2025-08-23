@@ -580,92 +580,38 @@ function generateWCAGTestExample(_state: GenerateState) { return "import { test,
 function generatePerformanceTestExample(_state: GenerateState) { return "import { test, expect } from '@playwright/test';\n"; }
 function generateLighthouseTestExample(_state: GenerateState) { return "import { test, expect } from '@playwright/test';\n"; }
 
+// Recursively serialize any JS object to YAML (simple, 2-space indent)
+function toYAML(obj: any, indent = 0): string {
+  const pad = '  '.repeat(indent);
+  if (Array.isArray(obj)) {
+    return obj.map(item => `${pad}- ${typeof item === 'object' && item !== null ? '\n' + toYAML(item, indent + 1) : item}`).join('\n');
+  } else if (typeof obj === 'object' && obj !== null) {
+    return Object.entries(obj)
+      .map(([k, v]) => {
+        if (Array.isArray(v)) {
+          return `${pad}${k}:\n${toYAML(v, indent + 1)}`;
+        } else if (typeof v === 'object' && v !== null) {
+          return `${pad}${k}:\n${toYAML(v, indent + 1)}`;
+        } else {
+          return `${pad}${k}: ${JSON.stringify(v)}`;
+        }
+      })
+      .join('\n');
+  } else {
+    return pad + JSON.stringify(obj);
+  }
+}
+
 function generateWorkflowContent(workflow: any) {
   if (!workflow || !workflow.name) {
     return 'name: Workflow\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - run: npm ci\n      - run: npm test';
   }
-
   let yaml = `name: ${workflow.name}\n`;
-
-  // Description
-  if (workflow.description) {
-    yaml += `description: ${workflow.description}\n`;
+  // Serialize all top-level keys except name
+  for (const [key, value] of Object.entries(workflow)) {
+    if (key === 'name') continue;
+    yaml += `${key}:\n${toYAML(value, 1)}\n`;
   }
-
-  // Triggers/on
-  if (workflow.on) {
-    // If user provides a full 'on' object, serialize it
-    yaml += 'on:\n';
-    for (const [trigger, value] of Object.entries(workflow.on)) {
-      if (Array.isArray(value)) {
-        yaml += `  ${trigger}:\n`;
-        value.forEach((item: any) => {
-          yaml += `    - ${item}\n`;
-        });
-      } else if (typeof value === 'object') {
-        yaml += `  ${trigger}:\n`;
-        if (value && typeof value === 'object') {
-          for (const [k, v] of Object.entries(value)) {
-            yaml += `    ${k}: ${JSON.stringify(v)}\n`;
-          }
-        }
-      } else {
-        yaml += `  ${trigger}: ${JSON.stringify(value)}\n`;
-      }
-    }
-  } else if (workflow.triggers && Array.isArray(workflow.triggers) && workflow.triggers.length > 0) {
-    yaml += `on: [${workflow.triggers.join(', ')}]\n`;
-  } else {
-    yaml += 'on: [push]\n';
-  }
-
-  // Environment variables
-  if (workflow.env && typeof workflow.env === 'object') {
-    yaml += 'env:\n';
-    for (const [k, v] of Object.entries(workflow.env)) {
-      yaml += `  ${k}: ${JSON.stringify(v)}\n`;
-    }
-  }
-
-  // Jobs
-  let jobs = '';
-  if (workflow.jobs && typeof workflow.jobs === 'object') {
-    for (const [jobName, job] of Object.entries(workflow.jobs)) {
-      const jobObj = job as Record<string, any>;
-      jobs += `  ${jobName}:\n`;
-      if (jobObj['name']) jobs += `    name: ${jobObj['name']}\n`;
-      jobs += `    runs-on: ${jobObj['runs-on'] || 'ubuntu-latest'}\n`;
-      if (jobObj['env']) {
-        jobs += '    env:\n';
-        for (const [k, v] of Object.entries(jobObj['env'])) {
-          jobs += `      ${k}: ${JSON.stringify(v)}\n`;
-        }
-      }
-      if (jobObj['steps'] && Array.isArray(jobObj['steps'])) {
-        jobs += '    steps:\n';
-        for (const step of jobObj['steps']) {
-          jobs += '      - ';
-          if (step.uses) {
-            jobs += `uses: ${step.uses}`;
-            if (step.with) {
-              jobs += '\n        with:';
-              for (const [k, v] of Object.entries(step.with)) {
-                jobs += `\n          ${k}: ${JSON.stringify(v)}`;
-              }
-            }
-          } else if (step.run) {
-            jobs += `run: ${step.run}`;
-          }
-          jobs += '\n';
-        }
-      }
-    }
-  } else {
-    // Default job if none provided
-    jobs = '  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - run: npm ci\n      - run: npm test\n';
-  }
-  yaml += `jobs:\n${jobs}`;
-
   return yaml;
 }
 
