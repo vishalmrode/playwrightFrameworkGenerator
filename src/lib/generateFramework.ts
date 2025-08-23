@@ -7,6 +7,7 @@
  */
 import { getLanguageExtension } from '@/lib/SelectProgrammingLanguage';
 import type { CIPipelineState, WorkflowConfig } from '@/types/ciPipeline';
+
 import JSZip from 'jszip';
 export interface GenerationProgress {
   progress: number;
@@ -201,6 +202,7 @@ function generatePlaywrightConfig(state: GenerateState) {
 async function generateTestExamples(zip: JSZip, state: GenerateState) {
   const ext = getLanguageExtension(state.language.selectedLanguage || 'javascript');
   const add = (path: string, content: string) => zip.file(path.replace(/\\/g, '/'), content);
+  add(`tests/api/example.api.spec.${ext}`, generateApiGetExample(ext));
 
   // --- Cucumber/BDD Support ---
   if (state.integrations && state.integrations['cucumber'] && state.integrations['cucumber'].enabled) {
@@ -228,7 +230,10 @@ async function generateTestExamples(zip: JSZip, state: GenerateState) {
     add(`tests/api/client/api-client.ts`, generateAPIClientExample(state));
   }
 
-  add(`tests/utils/test-base.${ext}`, generateTestBaseClass(state));
+  const testBaseContent = generateTestBaseClass(state);
+  if (testBaseContent !== undefined) {
+    add(`tests/utils/test-base.${ext}`, testBaseContent);
+  }
   add(`tests/utils/test-helpers.${ext}`, generateTestHelpersExample(state));
   add(`tests/utils/test-data.${ext}`, generateTestDataExample(state));
 
@@ -408,8 +413,6 @@ test('DELETE /api/users/1 deletes a user', async () => {
 
 
 // --- Add your other helper functions here (generatePageObjectExample, generateUITestExample, etc.) ---
-
-// ...existing code for other generators (generatePageObjectExample, generateUITestExample, etc.)...
 // (Keep your other helper functions as in your current file)
 function generateDockerfile(state: GenerateState) {
   const base = state.docker?.baseImage || 'mcr.microsoft.com/playwright:v1.41.2-focal';
@@ -594,22 +597,20 @@ function generateResponseModelExample() {
 
 function generateTestBaseClass(state: GenerateState) {
   const ext = getLanguageExtension(state.language.selectedLanguage || 'javascript');
-  if (ext === 'ts') {
-    return `import { test as base } from '@playwright/test';
+if (ext === 'ts') {
+  return `import { test as base, type Page } from '@playwright/test';
 
-export const test = base.extend({
+type TestFixtures = {
+  page: Page;
+  // Add more fixtures here
+};
+
+export const test = base.extend<TestFixtures>({
   // Add custom fixtures here
 });
 `;
-  } else {
-    return `const base = require('@playwright/test').test;
-const test = base.extend({
-  // Add custom fixtures here
-});
-module.exports = { test };
-`;
-  }
 }
+  }
 
 function generateTestHelpersExample(state: GenerateState) {
   return `export function randomEmail() {
@@ -714,17 +715,30 @@ test('homepage lighthouse', async ({ page }) => {
 `;
 }
 
-function generateEnvExample(state: GenerateState) {
+export function generateEnvExample(state: GenerateState) {
   return `# Example environment variables
 BASE_URL=${state.environment.baseUrl || 'http://localhost:3000'}
-API_URL=${state.environment.apiUrl || 'http://localhost:3000/api'}
+API_BASE_URL=${state.environment.apiUrl || 'http://localhost:3000/api'}
+API_KEY=your-api-key-here
+FEATURE_FLAGS=flag1,flag2
 `;
 }
 
-function generateEnvExampleForName(state: GenerateState, name: string) {
+export function generateEnvExampleForName(state: GenerateState, name: string) {
+  let baseUrl = state.environment.baseUrl || 'http://localhost:3000';
+  let apiUrl = state.environment.apiUrl || 'http://localhost:3000/api';
+  if (Array.isArray(state.environment.projects)) {
+    const proj = state.environment.projects.find(p => p.name === name);
+    if (proj) {
+      baseUrl = proj.baseUrl || baseUrl;
+      apiUrl = proj.apiUrl || apiUrl;
+    }
+  }
   return `# Environment: ${name}
-BASE_URL=${state.environment.baseUrl || 'http://localhost:3000'}
-API_URL=${state.environment.apiUrl || 'http://localhost:3000/api'}
+BASE_URL=${baseUrl}
+API_BASE_URL=${apiUrl}
+API_KEY=your-api-key-here
+FEATURE_FLAGS=flag1,flag2
 `;
 }
 
@@ -816,3 +830,5 @@ function toYAML(obj: any, indent = 0): string {
     })
     .join('\n');
 }
+
+// Use the exported versions directly
