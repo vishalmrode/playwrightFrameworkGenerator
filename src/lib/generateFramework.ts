@@ -156,46 +156,68 @@ function includeIntegrationDependencies(state: GenerateState, deps: Record<strin
 }
 
 function generatePlaywrightConfig(state: GenerateState) {
-  const reporters: string[] = [];
+  const ext = state.language.selectedLanguage === 'typescript' ? 'ts' : 'js';
+  // FIX: Use flat array of strings for simple reporters, array only for reporters with options
+  const reporters: any[] = [];
   if (state.integrations && state.integrations['allure-reporter'] && state.integrations['allure-reporter'].enabled) reporters.push('allure-playwright');
-  if (state.integrations && state.integrations['junit'] && state.integrations['junit'].enabled) reporters.push('junit');
+  if (state.integrations && state.integrations['junit'] && state.integrations['junit'].enabled) reporters.push(['junit', { outputFile: "results.xml" }]);
+  reporters.push('list');
+  reporters.push(['html', { outputFolder: "playwright-report" }]);
 
-  const projects: any[] = [];
+  const projects = [];
   const selected = state.browser.selectedBrowsers || {};
   Object.keys(selected).forEach((b) => {
     if (selected[b]) {
-      const use: any = { browserName: b };
-      const cfg = state.browser.configurations;
-      if (cfg) {
-        if (cfg.viewport) use.viewport = cfg.viewport;
-        if (cfg.deviceScaleFactor !== undefined) use.deviceScaleFactor = cfg.deviceScaleFactor;
-        if (cfg.isMobile !== undefined) use.isMobile = cfg.isMobile;
-        if (cfg.recordVideo !== undefined) use.recordVideo = cfg.recordVideo;
-        if (cfg.recordHar !== undefined) use.recordHar = cfg.recordHar;
-      }
+      // Always include all browser config options in use object
+      const cfg = state.browser.configurations || {};
+      const use: any = {
+        browserName: b,
+        viewport: cfg.viewport,
+        deviceScaleFactor: cfg.deviceScaleFactor,
+        isMobile: cfg.isMobile,
+        recordVideo: cfg.recordVideo,
+        recordHar: cfg.recordHar,
+      };
       projects.push({ name: b, use });
     }
   });
 
-  const base: any = {
-    reporter: reporters.length ? reporters : undefined,
-    projects,
-    testDir: './tests',
-    timeout: 30000,
-    expect: { timeout: 5000 },
-    fullyParallel: true,
-    use: {
-      baseURL: process.env.BASE_URL || state.environment.baseUrl || 'http://localhost:3000'
-    }
-  };
-
-  let configStr = "import { defineConfig } from '@playwright/test';\n\nexport default defineConfig(" + JSON.stringify(base, null, 2) + ");";
-  if (reporters.length) {
-    const reporterComments = reporters.map((r) => `// reporter: ['${r}']`).join('\n');
-    configStr += '\n\n' + reporterComments;
-    const rawMarkers = reporters.map((r) => `['${r}']`).join('\n');
-    configStr += '\n\n' + rawMarkers;
+  // Compose config as a string with all options and comments
+  let configStr = '';
+  if (ext === 'ts') {
+    configStr += `import { defineConfig, devices } from '@playwright/test';\n\n`;
+    configStr += `/**\n * Comprehensive Playwright configuration file\n * For all options, see: https://playwright.dev/docs/test-configuration\n */\n`;
+    configStr += `export default defineConfig({\n`;
+  } else {
+    configStr += `const { defineConfig, devices } = require('@playwright/test');\n\n`;
+    configStr += `/**\n * Comprehensive Playwright configuration file\n * For all options, see: https://playwright.dev/docs/test-configuration\n */\n`;
+    configStr += `module.exports = defineConfig({\n`;
   }
+  configStr += `  // Directory with test files\n  testDir: './tests',\n`;
+  configStr += `  // Directory with feature files (for BDD)\n  featureRoot: './features', // <-- custom, for Cucumber integration\n`;
+  configStr += `  // Directory with step definitions (for BDD)\n  stepDefinitions: './tests/steps', // <-- custom, for Cucumber integration\n`;
+  configStr += `  // Run tests in files in parallel\n  fullyParallel: true,\n`;
+  configStr += `  // Fail the build on CI if you accidentally left test.only in the source code.\n  forbidOnly: !!process.env.CI,\n`;
+  configStr += `  // Retry on CI only\n  retries: process.env.CI ? 2 : 0,\n`;
+  configStr += `  // Opt out of parallel tests on CI.\n  workers: process.env.CI ? 1 : undefined,\n`;
+  configStr += `  // Reporter(s) to use. See https://playwright.dev/docs/test-reporters\n  reporter: ${JSON.stringify(reporters, null, 2)},\n`;
+  configStr += `  // Projects for different browsers\n  projects: ${JSON.stringify(projects, null, 2)},\n`;
+  configStr += `  // Shared settings for all tests\n  use: {\n`;
+  configStr += `    // Base URL for actions like page.goto()\n    baseURL: process.env.BASE_URL || '${state.environment.baseUrl || 'http://localhost:3000'}',\n`;
+  configStr += `    // headless: true, // Run tests in headless mode\n`;
+  configStr += `    // viewport: { width: 1280, height: 720 },\n`;
+  configStr += `    // ignoreHTTPSErrors: true, // Ignore HTTPS errors\n`;
+  configStr += `    // video: 'on', // Record video for each test\n`;
+  configStr += `    // screenshot: 'only-on-failure', // Take screenshot only on failure\n`;
+  configStr += `    // trace: 'on-first-retry', // Collect trace on first retry\n`;
+  configStr += `    // actionTimeout: 0, // No limit\n`;
+  configStr += `    // navigationTimeout: 30000, // ms\n`;
+  configStr += `  },\n`;
+  configStr += `  // Output directory for test results\n  outputDir: 'test-results/',\n`;
+  configStr += `  // Global setup/teardown files\n  // globalSetup: './global-setup',\n  // globalTeardown: './global-teardown',\n`;
+  configStr += `  // Hooks\n  // retries: 0,\n  // workers: 1,\n`;
+  configStr += `  // Web server config (optional, for dev server)\n  webServer: {\n    command: 'npm run dev',\n    url: '${state.environment.baseUrl || 'http://localhost:3000'}',\n    reuseExistingServer: !process.env.CI,\n  },\n`;
+  configStr += `});\n`;
   return configStr;
 }
 

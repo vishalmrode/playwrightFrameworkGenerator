@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { generateFramework } from '../src/lib/generateFramework';
 import { DEFAULT_WORKFLOW_CONFIG } from '../src/types/ciPipeline';
 import JSZip from 'jszip';
+import JSON5 from 'json5';
 
 // Mock data
 import type { GenerateState } from '../src/lib/generateFramework';
@@ -539,7 +540,12 @@ describe('generateFramework', () => {
       // Our config is JSON-serialized in the file; extract the JSON object between defineConfig(...)
       const jsonMatch = /defineConfig\((\{[\s\S]*\})\)/.exec(configFile);
       expect(jsonMatch).not.toBeNull();
-      const cfgObj = JSON.parse(jsonMatch![1]);
+      let cfgObj;
+    try {
+      cfgObj = JSON5.parse(jsonMatch![1]);
+      } catch (e) {
+      cfgObj = eval('(' + jsonMatch![1] + ')');
+      }
       expect(cfgObj.projects).toBeInstanceOf(Array);
       for (const proj of cfgObj.projects) {
         expect(proj.use.viewport).toEqual({ width: 1920, height: 1080 });

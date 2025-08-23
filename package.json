@@ -1,7 +1,7 @@
 {
   "name": "playwright-framework-generator",
   "private": true,
-  "version": "1.1.5",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -87,6 +87,7 @@
     "autoprefixer": "10.4.21",
     "eslint": "^9.33.0",
     "eslint-plugin-react": "^7.37.5",
+    "json5": "^2.2.3",
     "pdfkit": "^0.13.0",
     "postcss": "8.5.6",
     "tailwindcss": "^3.3.0",
