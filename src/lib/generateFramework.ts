@@ -628,7 +628,16 @@ export {
  * Generates a basic GitHub Actions workflow YAML for Playwright tests.
  * This is always included as .github/workflows/playwright.yml.
  */
-function generateGithubWorkflow(_state: any) {
+function generateGithubWorkflow(state: any) {
+  // Find the workflow config for the main Playwright workflow (by name or index)
+  let workflow = null;
+  if (state?.ciPipeline?.workflows) {
+    workflow = state.ciPipeline.workflows.find((w: any) => w?.name?.toLowerCase().includes('playwright')) || state.ciPipeline.workflows[0];
+  }
+  if (workflow) {
+    return generateWorkflowContent(workflow);
+  }
+  // fallback to old default
   return [
     'name: Playwright Tests',
     'on: [push, pull_request]',
@@ -646,7 +655,16 @@ function generateGithubWorkflow(_state: any) {
   ].join('\n');
 }
 
-function generateGithubPrChecks(_workflow: any) {
+function generateGithubPrChecks(state: any) {
+  // Find the workflow config for PR Checks (by name or index)
+  let workflow = null;
+  if (state?.ciPipeline?.workflows) {
+    workflow = state.ciPipeline.workflows.find((w: any) => w?.name?.toLowerCase().includes('pr-checks') || w?.name?.toLowerCase().includes('pr')) || state.ciPipeline.workflows[0];
+  }
+  if (workflow) {
+    return generateWorkflowContent(workflow);
+  }
+  // fallback to old default
   return [
     'name: PR Checks',
     'on: [pull_request]',
@@ -660,7 +678,16 @@ function generateGithubPrChecks(_workflow: any) {
   ].join('\n');
 }
 
-function generateGithubNightly(_workflow: any) {
+function generateGithubNightly(state: any) {
+  // Find the workflow config for Nightly (by name or index)
+  let workflow = null;
+  if (state?.ciPipeline?.workflows) {
+    workflow = state.ciPipeline.workflows.find((w: any) => w?.name?.toLowerCase().includes('nightly')) || state.ciPipeline.workflows[1];
+  }
+  if (workflow) {
+    return generateWorkflowContent(workflow);
+  }
+  // fallback to old default
   return [
     'name: Nightly Tests',
     'on: schedule',
