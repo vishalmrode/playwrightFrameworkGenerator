@@ -581,34 +581,82 @@ function generatePerformanceTestExample(_state: GenerateState) { return "import 
 function generateLighthouseTestExample(_state: GenerateState) { return "import { test, expect } from '@playwright/test';\n"; }
 
 function generateWorkflowContent(workflow: any) {
-  // Basic fallback if no structure is provided
   if (!workflow || !workflow.name) {
     return 'name: Workflow\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - run: npm ci\n      - run: npm test';
   }
-  // Example: You can expand this to use workflow.triggers, workflow.jobs, etc.
-  let triggers = 'on: [push]';
-  if (workflow.triggers && Array.isArray(workflow.triggers) && workflow.triggers.length > 0) {
-    triggers = 'on: [' + workflow.triggers.join(', ') + ']';
+
+  let yaml = `name: ${workflow.name}\n`;
+
+  // Description
+  if (workflow.description) {
+    yaml += `description: ${workflow.description}\n`;
   }
+
+  // Triggers/on
+  if (workflow.on) {
+    // If user provides a full 'on' object, serialize it
+    yaml += 'on:\n';
+    for (const [trigger, value] of Object.entries(workflow.on)) {
+      if (Array.isArray(value)) {
+        yaml += `  ${trigger}:\n`;
+        value.forEach((item: any) => {
+          yaml += `    - ${item}\n`;
+        });
+      } else if (typeof value === 'object') {
+        yaml += `  ${trigger}:\n`;
+        if (value && typeof value === 'object') {
+          for (const [k, v] of Object.entries(value)) {
+            yaml += `    ${k}: ${JSON.stringify(v)}\n`;
+          }
+        }
+      } else {
+        yaml += `  ${trigger}: ${JSON.stringify(value)}\n`;
+      }
+    }
+  } else if (workflow.triggers && Array.isArray(workflow.triggers) && workflow.triggers.length > 0) {
+    yaml += `on: [${workflow.triggers.join(', ')}]\n`;
+  } else {
+    yaml += 'on: [push]\n';
+  }
+
+  // Environment variables
+  if (workflow.env && typeof workflow.env === 'object') {
+    yaml += 'env:\n';
+    for (const [k, v] of Object.entries(workflow.env)) {
+      yaml += `  ${k}: ${JSON.stringify(v)}\n`;
+    }
+  }
+
+  // Jobs
   let jobs = '';
   if (workflow.jobs && typeof workflow.jobs === 'object') {
     for (const [jobName, job] of Object.entries(workflow.jobs)) {
-      const typedJob = job as { [key: string]: any };
-      jobs += `  ${jobName}:\n    runs-on: ${typedJob["runs-on"] || 'ubuntu-latest'}\n    steps:\n`;
-      if (Array.isArray(typedJob.steps)) {
-        for (const step of typedJob.steps) {
+      const jobObj = job as Record<string, any>;
+      jobs += `  ${jobName}:\n`;
+      if (jobObj['name']) jobs += `    name: ${jobObj['name']}\n`;
+      jobs += `    runs-on: ${jobObj['runs-on'] || 'ubuntu-latest'}\n`;
+      if (jobObj['env']) {
+        jobs += '    env:\n';
+        for (const [k, v] of Object.entries(jobObj['env'])) {
+          jobs += `      ${k}: ${JSON.stringify(v)}\n`;
+        }
+      }
+      if (jobObj['steps'] && Array.isArray(jobObj['steps'])) {
+        jobs += '    steps:\n';
+        for (const step of jobObj['steps']) {
+          jobs += '      - ';
           if (step.uses) {
-            jobs += `      - uses: ${step.uses}`;
+            jobs += `uses: ${step.uses}`;
             if (step.with) {
               jobs += '\n        with:';
               for (const [k, v] of Object.entries(step.with)) {
-                jobs += `\n          ${k}: ${v}`;
+                jobs += `\n          ${k}: ${JSON.stringify(v)}`;
               }
             }
-            jobs += '\n';
           } else if (step.run) {
-            jobs += `      - run: ${step.run}\n`;
+            jobs += `run: ${step.run}`;
           }
+          jobs += '\n';
         }
       }
     }
@@ -616,7 +664,9 @@ function generateWorkflowContent(workflow: any) {
     // Default job if none provided
     jobs = '  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - run: npm ci\n      - run: npm test\n';
   }
-  return `name: ${workflow.name}\n${triggers}\njobs:\n${jobs}`;
+  yaml += `jobs:\n${jobs}`;
+
+  return yaml;
 }
 
 // Exported for tests (keeps file shape similar)
