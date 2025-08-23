@@ -157,28 +157,27 @@ function includeIntegrationDependencies(state: GenerateState, deps: Record<strin
 
 function generatePlaywrightConfig(state: GenerateState) {
   const ext = state.language.selectedLanguage === 'typescript' ? 'ts' : 'js';
-  const reporters = [];
-  if (state.integrations && state.integrations['allure-reporter'] && state.integrations['allure-reporter'].enabled) reporters.push(["allure-playwright"]);
-  if (state.integrations && state.integrations['junit'] && state.integrations['junit'].enabled) reporters.push(["junit", { outputFile: "results.xml" }]);
-  reporters.push(["list"]);
-  // Instead of:
-  reporters.push(["allure-playwright"]);
-  reporters.push(["html", { outputFolder: "playwright-report" }]);
-  reporters.push(["html", { outputFolder: "playwright-report" }]);
+  // FIX: Use flat array of strings for simple reporters, array only for reporters with options
+  const reporters: any[] = [];
+  if (state.integrations && state.integrations['allure-reporter'] && state.integrations['allure-reporter'].enabled) reporters.push('allure-playwright');
+  if (state.integrations && state.integrations['junit'] && state.integrations['junit'].enabled) reporters.push(['junit', { outputFile: "results.xml" }]);
+  reporters.push('list');
+  reporters.push(['html', { outputFolder: "playwright-report" }]);
 
   const projects = [];
   const selected = state.browser.selectedBrowsers || {};
   Object.keys(selected).forEach((b) => {
     if (selected[b]) {
-      const use = { browserName: b };
-      const cfg = state.browser.configurations;
-      if (cfg) {
-        if (cfg.viewport) use.viewport = cfg.viewport;
-        if (cfg.deviceScaleFactor !== undefined) use.deviceScaleFactor = cfg.deviceScaleFactor;
-        if (cfg.isMobile !== undefined) use.isMobile = cfg.isMobile;
-        if (cfg.recordVideo !== undefined) use.recordVideo = cfg.recordVideo;
-        if (cfg.recordHar !== undefined) use.recordHar = cfg.recordHar;
-      }
+      // Always include all browser config options in use object
+      const cfg = state.browser.configurations || {};
+      const use: any = {
+        browserName: b,
+        viewport: cfg.viewport,
+        deviceScaleFactor: cfg.deviceScaleFactor,
+        isMobile: cfg.isMobile,
+        recordVideo: cfg.recordVideo,
+        recordHar: cfg.recordHar,
+      };
       projects.push({ name: b, use });
     }
   });
