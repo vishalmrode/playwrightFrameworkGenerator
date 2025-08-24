@@ -1,5 +1,5 @@
-export const VERSION = '1.2.0';
-export const BUILD_DATE = '2025-08-23';
+export const VERSION = '1.3.0';
+export const BUILD_DATE = '2025-08-24';
 
 export interface VersionInfo {
   version: string;
