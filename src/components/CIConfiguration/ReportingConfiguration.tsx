@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { FileText, BarChart3, Globe, Target, Plus, X } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { updateWorkflowReporting } from "@/store/slices/ciPipelineSlice";
 import { Button } from "@/components/ui/button";
@@ -86,6 +87,12 @@ export function ReportingConfiguration() {
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <FileText className="w-5 h-5" />
             Test Reporting
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="ml-1 cursor-help text-muted-foreground">?</span>
+              </TooltipTrigger>
+              <TooltipContent>Configure which test reports are generated and published after CI runs.</TooltipContent>
+            </Tooltip>
           </h3>
           <p className="text-sm text-muted-foreground">
             Configure test result reporting and publishing
@@ -104,6 +111,12 @@ export function ReportingConfiguration() {
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4" />
                 HTML Report
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                  </TooltipTrigger>
+                  <TooltipContent>Generates a human-readable HTML report of all test results.</TooltipContent>
+                </Tooltip>
               </div>
               <Switch
                 checked={reporting.htmlReport.enabled}
@@ -161,6 +174,12 @@ export function ReportingConfiguration() {
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
                 JUnit XML Report
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                  </TooltipTrigger>
+                  <TooltipContent>Produces a machine-readable XML report for integration with CI tools.</TooltipContent>
+                </Tooltip>
               </div>
               <Switch
                 checked={reporting.junit.enabled}
@@ -199,6 +218,12 @@ export function ReportingConfiguration() {
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
                 Code Coverage
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                  </TooltipTrigger>
+                  <TooltipContent>Shows what percentage of your code is covered by tests.</TooltipContent>
+                </Tooltip>
               </div>
               <Switch
                 checked={reporting.coverage.enabled}
@@ -265,6 +290,12 @@ export function ReportingConfiguration() {
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4" />
                 Allure Report
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                  </TooltipTrigger>
+                  <TooltipContent>Generates a rich, interactive test report with history and analytics.</TooltipContent>
+                </Tooltip>
               </div>
               <Switch
                 checked={reporting.allure.enabled}
@@ -321,6 +352,12 @@ export function ReportingConfiguration() {
             <CardTitle className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
               Custom Reports
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                </TooltipTrigger>
+                <TooltipContent>Add your own custom report commands and outputs.</TooltipContent>
+              </Tooltip>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

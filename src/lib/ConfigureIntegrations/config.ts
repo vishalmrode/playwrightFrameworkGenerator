@@ -83,7 +83,7 @@ export const GITHUB_ACTIONS_CONFIG: ConfigurationGroup[] = [
         key: 'nodeVersions',
         label: 'Node.js Versions',
         type: 'array',
-        defaultValue: ['18.x', '20.x'],
+        defaultValue: ['18.x', '20.x', '22.x', '23.x', '24.x'],
       },
       {
         key: 'operatingSystems',

@@ -59,7 +59,7 @@ export const DEFAULT_INTEGRATIONS_STATE: IntegrationsState = {
       pullRequest: true,
       schedule: false,
     },
-    nodeVersions: ['18.x', '20.x'],
+    nodeVersions: ['18.x', '20.x', '22.x', '23.x', '24.x'],
     operatingSystems: ['ubuntu-latest'],
   },
   allureReporter: {

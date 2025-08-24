@@ -8,6 +8,7 @@ import { Globe, Laptop, Monitor, Smartphone, Plus, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { updateWorkflowEnvironments } from "@/store/slices/ciPipelineSlice";
 import { NODE_VERSIONS, OPERATING_SYSTEMS, BROWSERS } from "@/types/ciPipeline";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useState } from "react";
 
 export function EnvironmentConfiguration() {
@@ -106,6 +107,12 @@ export function EnvironmentConfiguration() {
                 <div className="w-2 h-2 bg-white rounded-full" />
               </div>
               Node.js Versions
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                </TooltipTrigger>
+                <TooltipContent>Select which Node.js versions to test your project against in CI. Newer versions may have breaking changes.</TooltipContent>
+              </Tooltip>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -119,7 +126,12 @@ export function EnvironmentConfiguration() {
                     data-testid={`node-version-${value}`}
                   />
                   <Label htmlFor={`node-${value}`} className="text-sm">
-                    {label}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>{label}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>Enable testing on Node.js {label.replace(/[^0-9]+/g, '')}</TooltipContent>
+                    </Tooltip>
                   </Label>
                 </div>
               ))}
@@ -138,6 +150,12 @@ export function EnvironmentConfiguration() {
             <CardTitle className="flex items-center gap-2">
               <Monitor className="w-4 h-4" />
               Operating Systems
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                </TooltipTrigger>
+                <TooltipContent>Select which operating systems to run your tests on. Useful for cross-platform compatibility.</TooltipContent>
+              </Tooltip>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -153,7 +171,12 @@ export function EnvironmentConfiguration() {
                   <div className="flex items-center space-x-2">
                     {getOSIcon(value)}
                     <Label htmlFor={`os-${value}`} className="text-sm">
-                      {label}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>{label}</span>
+                        </TooltipTrigger>
+                        <TooltipContent>Enable testing on {label}</TooltipContent>
+                      </Tooltip>
                     </Label>
                   </div>
                 </div>
@@ -173,6 +196,12 @@ export function EnvironmentConfiguration() {
             <CardTitle className="flex items-center gap-2">
               <Smartphone className="w-4 h-4" />
               Browsers
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                </TooltipTrigger>
+                <TooltipContent>Select browsers for end-to-end testing. Ensures your app works across all major browsers.</TooltipContent>
+              </Tooltip>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -186,7 +215,12 @@ export function EnvironmentConfiguration() {
                     data-testid={`browser-${value}`}
                   />
                   <Label htmlFor={`browser-${value}`} className="text-sm">
-                    {label}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>{label}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>Enable testing on {label}</TooltipContent>
+                    </Tooltip>
                   </Label>
                 </div>
               ))}
@@ -205,6 +239,12 @@ export function EnvironmentConfiguration() {
             <CardTitle className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
               Custom Environment Variables
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                </TooltipTrigger>
+                <TooltipContent>Define custom environment variables for your CI jobs. Useful for secrets, feature flags, etc.</TooltipContent>
+              </Tooltip>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -236,7 +276,15 @@ export function EnvironmentConfiguration() {
             <div className="space-y-3 p-3 border border-dashed border-border rounded-lg">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="custom-var-name">Variable Name</Label>
+                  <Label htmlFor="custom-var-name">
+                    Variable Name
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                      </TooltipTrigger>
+                      <TooltipContent>Name of the environment variable (e.g., DATABASE_TYPE).</TooltipContent>
+                    </Tooltip>
+                  </Label>
                   <Input
                     id="custom-var-name"
                     value={newVariableName}
@@ -246,7 +294,15 @@ export function EnvironmentConfiguration() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="custom-var-values">Values (comma-separated)</Label>
+                  <Label htmlFor="custom-var-values">
+                    Values (comma-separated)
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="ml-1 cursor-help text-muted-foreground">?</span>
+                      </TooltipTrigger>
+                      <TooltipContent>Comma-separated values for this variable (e.g., mysql, postgres, sqlite).</TooltipContent>
+                    </Tooltip>
+                  </Label>
                   <Input
                     id="custom-var-values"
                     value={newVariableValues}

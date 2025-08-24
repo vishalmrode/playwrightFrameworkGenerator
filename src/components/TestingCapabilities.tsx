@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Monitor, Globe, AlertTriangle, Eye } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useAppSelector, useAppDispatch } from "@/hooks/redux";
 import { toggleTestingCapability } from "@/store/slices/testingCapabilitiesSlice";
 import { validateTestingCapabilities, getTestingCapabilitiesDescription, getIncludedUtilities } from "@/lib/ConfigureTestingCapabilities";
@@ -30,6 +31,14 @@ export function TestingCapabilities() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2" data-testid="testing-capabilities-title">
           Testing Capabilities
+          <Tooltip>
+            <TooltipTrigger>
+              <span><Eye className="w-4 h-4 text-muted-foreground" /></span>
+            </TooltipTrigger>
+            <TooltipContent>
+              Select which types of tests to include in your generated framework. Hover over each option for more info.
+            </TooltipContent>
+          </Tooltip>
           {!isValid && (
             <Badge variant="destructive" className="text-xs">
               <AlertTriangle className="w-3 h-3 mr-1" />
@@ -57,6 +66,14 @@ export function TestingCapabilities() {
                 <div className="flex items-center gap-2">
                   <Monitor className="w-4 h-4" />
                   <span className="font-medium">E2E Testing</span>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span><Eye className="w-3 h-3 text-muted-foreground" /></span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      End-to-end browser automation and scenario testing
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 <span className="text-sm text-muted-foreground">
                   End-to-end browser automation and scenario testing
@@ -75,6 +92,14 @@ export function TestingCapabilities() {
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4" />
                   <span className="font-medium">API Testing</span>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span><Eye className="w-3 h-3 text-muted-foreground" /></span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      REST and GraphQL endpoint testing with request validation and response verification
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 <span className="text-sm text-muted-foreground">
                   REST and GraphQL endpoint testing with request validation and response verification
@@ -93,6 +118,14 @@ export function TestingCapabilities() {
                 <div className="flex items-center gap-2">
                   <Eye className="w-4 h-4" />
                   <span className="font-medium">Visual Testing</span>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span><Eye className="w-3 h-3 text-muted-foreground" /></span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Visual regression and screenshot comparison
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 <span className="text-sm text-muted-foreground">
                   Visual regression and screenshot comparison
