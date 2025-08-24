@@ -43,8 +43,12 @@ jobs:
       - name: Run tests
         run: npm test
 
+
       - name: Run build
         run: npm run build
+
+      - name: Check build assets for valid JavaScript
+        run: npm run check-build-assets
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
