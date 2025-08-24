@@ -95,6 +95,14 @@ export function SecurityConfiguration() {
             <CardTitle className="flex items-center gap-2">
               <Eye className="w-4 h-4" />
               Security Scanning
+              <Tooltip>
+                <TooltipTrigger>
+                  <span><Shield className="w-3 h-3 text-muted-foreground" /></span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Enable scanning for secrets, vulnerable dependencies, and code issues in your workflow.
+                </TooltipContent>
+              </Tooltip>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -148,6 +156,14 @@ export function SecurityConfiguration() {
             <CardTitle className="flex items-center gap-2">
               <Lock className="w-4 h-4" />
               Workflow Permissions
+              <Tooltip>
+                <TooltipTrigger>
+                  <span><Shield className="w-3 h-3 text-muted-foreground" /></span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Set the minimum permissions required for your workflow. Lower permissions improve security.
+                </TooltipContent>
+              </Tooltip>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

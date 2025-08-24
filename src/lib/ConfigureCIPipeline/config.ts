@@ -7,6 +7,11 @@ export const createWorkflowConfig = (overrides: Partial<WorkflowConfig> = {}): W
   return {
     ...DEFAULT_WORKFLOW_CONFIG,
     ...overrides,
+    environments: {
+      ...DEFAULT_WORKFLOW_CONFIG.environments,
+      ...overrides.environments,
+      nodeVersions: overrides.environments?.nodeVersions || ['18.x', '20.x', '22.x', '23.x', '24.x'],
+    },
     id: overrides.id || `workflow-${Date.now()}`,
   };
 };
@@ -37,7 +42,7 @@ export const createWorkflowFromTemplate = (templateId: string): WorkflowConfig =
         },
         environments: {
           ...baseConfig.environments,
-          nodeVersions: ['20.x'],
+          nodeVersions: ['20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest'],
           browsers: ['chromium'],
         },
@@ -55,7 +60,7 @@ export const createWorkflowFromTemplate = (templateId: string): WorkflowConfig =
         },
         environments: {
           ...baseConfig.environments,
-          nodeVersions: ['18.x', '20.x'],
+          nodeVersions: ['18.x', '20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest', 'windows-latest', 'macos-latest'],
           browsers: ['chromium', 'firefox', 'webkit'],
         },
@@ -154,7 +159,7 @@ export const createWorkflowFromTemplate = (templateId: string): WorkflowConfig =
         },
         environments: {
           ...baseConfig.environments,
-          nodeVersions: ['18.x', '20.x'],
+          nodeVersions: ['18.x', '20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest', 'windows-latest', 'macos-latest'],
         },
         reporting: {
@@ -236,7 +241,7 @@ export const createWorkflowFromTemplate = (templateId: string): WorkflowConfig =
         },
         environments: {
           ...baseConfig.environments,
-          nodeVersions: ['20.x'],
+          nodeVersions: ['20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest'],
           browsers: ['chromium'],
         },
@@ -283,7 +288,7 @@ export const createWorkflowFromTemplate = (templateId: string): WorkflowConfig =
         },
         environments: {
           ...baseConfig.environments,
-          nodeVersions: ['20.x'],
+          nodeVersions: ['20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest'],
           browsers: ['chromium', 'firefox'],
         },
@@ -325,7 +330,7 @@ export const getRecommendedSettings = (projectType: 'small' | 'medium' | 'large'
       return {
         executionStrategy: { mode: 'parallel' as const, parallelism: 2, timeout: 15 },
         environments: {
-          nodeVersions: ['20.x'],
+          nodeVersions: ['20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest'],
           browsers: ['chromium'],
         },
@@ -336,7 +341,7 @@ export const getRecommendedSettings = (projectType: 'small' | 'medium' | 'large'
       return {
         executionStrategy: { mode: 'sharded' as const, shards: 4, timeout: 25 },
         environments: {
-          nodeVersions: ['18.x', '20.x'],
+          nodeVersions: ['18.x', '20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest', 'windows-latest'],
           browsers: ['chromium', 'firefox'],
         },
@@ -347,7 +352,7 @@ export const getRecommendedSettings = (projectType: 'small' | 'medium' | 'large'
       return {
         executionStrategy: { mode: 'matrix' as const, timeout: 35 },
         environments: {
-          nodeVersions: ['18.x', '20.x'],
+          nodeVersions: ['18.x', '20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest', 'windows-latest', 'macos-latest'],
           browsers: ['chromium', 'firefox', 'webkit'],
         },
@@ -358,7 +363,7 @@ export const getRecommendedSettings = (projectType: 'small' | 'medium' | 'large'
       return {
         executionStrategy: { mode: 'sharded' as const, shards: 8, timeout: 45 },
         environments: {
-          nodeVersions: ['18.x', '20.x'],
+          nodeVersions: ['18.x', '20.x', '22.x', '23.x', '24.x'],
           operatingSystems: ['ubuntu-latest', 'windows-latest', 'macos-latest'],
           browsers: ['chromium', 'firefox', 'webkit'],
         },

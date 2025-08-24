@@ -254,7 +254,7 @@ export const DEFAULT_WORKFLOW_CONFIG: WorkflowConfig = {
     delaySeconds: 30,
   },
   environments: {
-    nodeVersions: ['18.x', '20.x'],
+    nodeVersions: ['18.x', '20.x', '22.x', '23.x', '24.x'],
     operatingSystems: ['ubuntu-latest'],
     browsers: ['chromium', 'firefox', 'webkit'],
   },
@@ -364,8 +364,11 @@ export const DEFAULT_CI_PIPELINE_STATE: CIPipelineState = {
 export const NODE_VERSIONS = [
   { value: '16.x', label: 'Node.js 16' },
   { value: '18.x', label: 'Node.js 18 (LTS)' },
-  { value: '20.x', label: 'Node.js 20 (Current)' },
-  { value: '21.x', label: 'Node.js 21 (Latest)' },
+  { value: '20.x', label: 'Node.js 20' },
+  { value: '21.x', label: 'Node.js 21' },
+  { value: '22.x', label: 'Node.js 22' },
+  { value: '23.x', label: 'Node.js 23' },
+  { value: '24.x', label: 'Node.js 24 (Latest)' },
 ] as const;
 
 export const OPERATING_SYSTEMS = [

@@ -89,10 +89,50 @@ export function FixturesConfiguration() {
       <CardContent>
         <Tabs defaultValue="patterns" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="patterns" data-testid="patterns-tab">Patterns</TabsTrigger>
-            <TabsTrigger value="data" data-testid="data-tab">Data</TabsTrigger>
-            <TabsTrigger value="auth" data-testid="auth-tab">Auth</TabsTrigger>
-            <TabsTrigger value="settings" data-testid="settings-tab">Settings</TabsTrigger>
+            <TabsTrigger value="patterns" data-testid="patterns-tab">
+              Patterns
+              <Tooltip>
+                <TooltipTrigger>
+                  <span><Info className="w-3 h-3 text-muted-foreground ml-1" /></span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Choose which page object and setup/teardown patterns to include in your test framework.
+                </TooltipContent>
+              </Tooltip>
+            </TabsTrigger>
+            <TabsTrigger value="data" data-testid="data-tab">
+              Data
+              <Tooltip>
+                <TooltipTrigger>
+                  <span><Info className="w-3 h-3 text-muted-foreground ml-1" /></span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Configure test data management strategies and file formats.
+                </TooltipContent>
+              </Tooltip>
+            </TabsTrigger>
+            <TabsTrigger value="auth" data-testid="auth-tab">
+              Auth
+              <Tooltip>
+                <TooltipTrigger>
+                  <span><Info className="w-3 h-3 text-muted-foreground ml-1" /></span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Manage authentication fixtures and methods for your tests.
+                </TooltipContent>
+              </Tooltip>
+            </TabsTrigger>
+            <TabsTrigger value="settings" data-testid="settings-tab">
+              Settings
+              <Tooltip>
+                <TooltipTrigger>
+                  <span><Info className="w-3 h-3 text-muted-foreground ml-1" /></span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Adjust global fixture settings, timeouts, and advanced options.
+                </TooltipContent>
+              </Tooltip>
+            </TabsTrigger>
           </TabsList>
 
           {/* Quick Presets */}

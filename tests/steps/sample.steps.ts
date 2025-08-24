@@ -22,3 +22,21 @@ Then('I should see the dashboard', async function () {
     // This checks that the dashboard header is visible
     await expect(this.page.locator('h1')).toHaveText('Dashboard');
 });
+import { Given, When, Then } from '@cucumber/cucumber';
+import { expect } from '@playwright/test';
+
+
+When('I enter username {string}', async function (username: string) {
+    await this.page.fill('input#username', username);
+});
+
+When('I enter password {string}', async function (password: string) {
+    await this.page.fill('input#password', password);
+});
+
+
+Then('I should see the dashboard', async function () {
+    // Assuming the feature file says: Then I should see the dashboard
+    // This checks that the dashboard header is visible
+    await expect(this.page.locator('h1')).toHaveText('Dashboard');
+});

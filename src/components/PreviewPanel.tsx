@@ -77,6 +77,9 @@ export function PreviewPanel() {
                 <FolderTree className="w-4 h-4" />
                 <span className="text-sm font-medium">Project Structure</span>
               </div>
+              <div className="text-xs text-muted-foreground mb-2">
+                <strong>Note:</strong> This is a visual representation for guidance only. The actual generated project may differ.
+              </div>
               <ScrollArea className="h-64" data-testid="project-structure">
                 <div className="space-y-1 text-sm font-mono">
                   <div>📁 playwright-framework/</div>
@@ -112,6 +115,9 @@ export function PreviewPanel() {
               <div className="flex items-center gap-2 mb-3">
                 <Settings className="w-4 h-4" />
                 <span className="text-sm font-medium">Key Configurations</span>
+              </div>
+              <div className="text-xs text-muted-foreground mb-2">
+                <strong>Note:</strong> This is a visual representation for guidance only. The actual generated configuration files may differ.
               </div>
               <ScrollArea className="h-64" data-testid="config-preview">
                 <div className="space-y-3">
@@ -154,6 +160,9 @@ export function PreviewPanel() {
               <div className="flex items-center gap-2 mb-3">
                 <Code className="w-4 h-4" />
                 <span className="text-sm font-medium">Sample Test</span>
+              </div>
+              <div className="text-xs text-muted-foreground mb-2">
+                <strong>Note:</strong> This is a sample for demonstration only. The actual generated test code may differ.
               </div>
               <ScrollArea className="h-64" data-testid="sample-code">
                 <div className="p-3 bg-muted rounded-lg">
