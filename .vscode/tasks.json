@@ -56,6 +56,34 @@
 				"$tsc"
 			],
 			"group": "test"
+		},
+		{
+			"label": "build",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "test",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"test"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "test"
 		}
 	]
 }

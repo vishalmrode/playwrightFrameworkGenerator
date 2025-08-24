@@ -17,7 +17,7 @@ export function Header() {
               </h1>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="h-6 px-2">v{VERSION}</Badge>
-                <a href="/USER_MANUAL.pdf" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground underline">Download Manual (PDF)</a>
+                <a href="./USER_MANUAL.pdf" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground underline">Download Manual (PDF)</a>
               </div>
             </div>
             <p className="text-muted-foreground mt-2" data-testid="app-description">
