@@ -11,6 +11,7 @@ export interface EnvironmentConfig {
     password?: string;
   };
   customSettings?: Record<string, string | number | boolean>;
+  envVars?: { key: string; value: string }[];
 }
 
 export interface EnvironmentState {

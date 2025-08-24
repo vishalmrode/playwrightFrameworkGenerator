@@ -56,7 +56,13 @@ export default function DownloadManualButton() {
   };
 
   return (
-    <Button variant="ghost" size="sm" onClick={handleDownload} title="Download user manual as PDF">
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleDownload}
+      title="Download user manual as PDF"
+      data-testid="download-manual"
+    >
       <Download className="w-4 h-4 mr-2" />
       Manual
     </Button>
