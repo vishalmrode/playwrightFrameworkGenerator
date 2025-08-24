@@ -25,6 +25,8 @@ const GenerateButton = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [statusMessage, setStatusMessage] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [projectNameError, setProjectNameError] = useState('');
 
   // Optimized selectors to prevent unnecessary rerenders
   const selectedLanguage = useAppSelector((state) => state.language.selectedLanguage);
@@ -100,6 +102,14 @@ const GenerateButton = () => {
 
   const handleGenerate = async () => {
     if (!canGenerate) return;
+    // Project name validation (assume input is in the DOM with data-testid="project-name-input")
+    const projectNameInput = document.querySelector('[data-testid="project-name-input"]') as HTMLInputElement | null;
+    if (projectNameInput && !projectNameInput.value.trim()) {
+      setProjectNameError('Project name is required.');
+      return;
+    } else {
+      setProjectNameError('');
+    }
     let hadError = false;
     try {
       setIsGenerating(true);
@@ -130,18 +140,33 @@ const GenerateButton = () => {
         throw new Error('Failed to generate framework file: unsupported binary type');
       }
 
-      downloadBlob(outBlob, 'playwright-framework.zip');
+      // Use the project name as the zip filename, fallback to default if blank
+      let zipName = 'playwright-framework.zip';
+      if (projectNameInput && projectNameInput.value.trim()) {
+        // Sanitize: remove unsafe characters, spaces to dashes, lowercased
+        zipName = projectNameInput.value.trim()
+          .replace(/[^a-zA-Z0-9-_]+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '')
+          .toLowerCase() + '.zip';
+      }
+      downloadBlob(outBlob, zipName);
 
       // Show success for a moment
       setProgress(100);
       setStatusMessage('Framework generation complete! Downloading...');
+      setShowSuccess(true);
       await new Promise(resolve => setTimeout(resolve, 1000));
       // Clear the success message shortly after showing it so users see success
-      setTimeout(() => setStatusMessage(''), 1200);
+      setTimeout(() => {
+        setStatusMessage('');
+        setShowSuccess(false);
+      }, 1200);
     } catch (error) {
       hadError = true;
       console.error('Error generating framework:', error);
       setStatusMessage(error instanceof Error ? error.message : 'Error generating framework. Please try again.');
+      setShowSuccess(false);
     } finally {
       setIsGenerating(false);
       setProgress(0);
@@ -188,6 +213,12 @@ const GenerateButton = () => {
             </div>
           )}
 
+          {projectNameError && (
+            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg" data-testid="project-name-error">
+              <p className="text-sm text-destructive text-center">{projectNameError}</p>
+            </div>
+          )}
+
           {isGenerating && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -222,6 +253,13 @@ const GenerateButton = () => {
               </>
             )}
           </Button>
+
+          {showSuccess && (
+            <div className="flex items-center justify-center mt-4 text-green-600" data-testid="generation-success">
+              <CheckCircle className="w-5 h-5 mr-2" />
+              <span>Framework generated successfully!</span>
+            </div>
+          )}
 
           <div className="text-xs text-center text-muted-foreground">
             <p>Estimated size: ~2.5MB • Includes all dependencies and examples</p>

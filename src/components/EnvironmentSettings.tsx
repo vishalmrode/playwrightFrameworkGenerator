@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +64,19 @@ function EnvironmentForm({ environment, onChange, errors = [] }: EnvironmentForm
     onChange({ ...environment, [field]: value });
   };
 
+  // Dynamic envVars logic
+  const envVars = environment.envVars || [{ key: '', value: '' }];
+  const updateEnvVar = (idx: number, key: string, value: string) => {
+    const updated = envVars.map((pair, i) => i === idx ? { key, value } : pair);
+    onChange({ ...environment, envVars: updated });
+  };
+  const addEnvVar = () => {
+    onChange({ ...environment, envVars: [...envVars, { key: '', value: '' }] });
+  };
+  const removeEnvVar = (idx: number) => {
+    onChange({ ...environment, envVars: envVars.filter((_, i) => i !== idx) });
+  };
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -77,7 +90,6 @@ function EnvironmentForm({ environment, onChange, errors = [] }: EnvironmentForm
             data-testid="environment-name-input"
           />
         </div>
-
         <div className="space-y-2">
           <Label htmlFor="base-url">Base URL *</Label>
           <Input
@@ -89,7 +101,6 @@ function EnvironmentForm({ environment, onChange, errors = [] }: EnvironmentForm
           />
         </div>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="timeout">Timeout (ms)</Label>
@@ -103,7 +114,6 @@ function EnvironmentForm({ environment, onChange, errors = [] }: EnvironmentForm
             data-testid="environment-timeout-input"
           />
         </div>
-
         <div className="space-y-2">
           <Label htmlFor="retries">Retries</Label>
           <Input
@@ -116,6 +126,41 @@ function EnvironmentForm({ environment, onChange, errors = [] }: EnvironmentForm
             data-testid="environment-retries-input"
           />
         </div>
+      </div>
+      {/* Dynamic environment variable fields */}
+      {envVars.map((pair, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4" key={idx}>
+          <div className="space-y-2">
+            <Label htmlFor={`env-key-${idx}`}>Env Key</Label>
+            <Input
+              id={`env-key-${idx}`}
+              value={pair.key}
+              onChange={(e) => updateEnvVar(idx, e.target.value, pair.value)}
+              placeholder="e.g., API_KEY"
+              data-testid={`env-key-input-${idx}`}
+            />
+          </div>
+          <div className="space-y-2 flex items-center gap-2">
+            <div className="flex-1">
+              <Label htmlFor={`env-value-${idx}`}>Env Value</Label>
+              <Input
+                id={`env-value-${idx}`}
+                value={pair.value}
+                onChange={(e) => updateEnvVar(idx, pair.key, e.target.value)}
+                placeholder="e.g., secret123"
+                data-testid={`env-value-input-${idx}`}
+              />
+            </div>
+            {envVars.length > 1 && (
+              <Button variant="ghost" size="icon" onClick={() => removeEnvVar(idx)} aria-label="Remove Env Var">
+                <Trash className="w-4 h-4 text-destructive" />
+              </Button>
+            )}
+          </div>
+        </div>
+      ))}
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" data-testid="add-env-var" onClick={addEnvVar}>Add Env Var</Button>
       </div>
 
       <div className="space-y-4">

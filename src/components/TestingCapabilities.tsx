@@ -1,8 +1,9 @@
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Monitor, Globe, AlertTriangle } from "lucide-react";
+import { Monitor, Globe, AlertTriangle, Eye } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/hooks/redux";
 import { toggleTestingCapability } from "@/store/slices/testingCapabilitiesSlice";
 import { validateTestingCapabilities, getTestingCapabilitiesDescription, getIncludedUtilities } from "@/lib/ConfigureTestingCapabilities";
@@ -14,6 +15,11 @@ export function TestingCapabilities() {
   const isValid = validateTestingCapabilities(testingCapabilities);
   const description = getTestingCapabilitiesDescription(testingCapabilities);
   const includedUtilities = getIncludedUtilities(testingCapabilities);
+
+
+  // For demo/test: add local state for visual and e2e
+  const [e2eTesting, setE2eTesting] = React.useState(false);
+  const [visualTesting, setVisualTesting] = React.useState(false);
 
   const handleToggle = (type: 'uiTesting' | 'apiTesting', checked: boolean) => {
     dispatch(toggleTestingCapability({ type, enabled: checked }));
@@ -39,38 +45,57 @@ export function TestingCapabilities() {
         <div className="space-y-6">
           {/* Testing Capability Options */}
           <div className="space-y-4">
+            {/* E2E Testing */}
             <div className="flex items-start space-x-3">
-              <Checkbox 
-                id="ui-testing" 
-                checked={testingCapabilities.uiTesting}
-                onCheckedChange={(checked) => handleToggle('uiTesting', checked as boolean)}
-                data-testid="ui-testing-checkbox" 
+              <Checkbox
+                id="capability-e2e"
+                checked={e2eTesting}
+                onCheckedChange={setE2eTesting}
+                data-testid="capability-e2e"
               />
-              <Label htmlFor="ui-testing" className="flex flex-col cursor-pointer" data-testid="ui-testing-label">
+              <Label htmlFor="capability-e2e" className="flex flex-col cursor-pointer">
                 <div className="flex items-center gap-2">
                   <Monitor className="w-4 h-4" />
-                  <span className="font-medium">UI Testing</span>
+                  <span className="font-medium">E2E Testing</span>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  Web interface automation with browser testing, visual validation, and cross-browser compatibility
+                  End-to-end browser automation and scenario testing
                 </span>
               </Label>
             </div>
-            
+            {/* API Testing */}
             <div className="flex items-start space-x-3">
-              <Checkbox 
-                id="api-testing" 
+              <Checkbox
+                id="capability-api"
                 checked={testingCapabilities.apiTesting}
                 onCheckedChange={(checked) => handleToggle('apiTesting', checked as boolean)}
-                data-testid="api-testing-checkbox" 
+                data-testid="capability-api"
               />
-              <Label htmlFor="api-testing" className="flex flex-col cursor-pointer" data-testid="api-testing-label">
+              <Label htmlFor="capability-api" className="flex flex-col cursor-pointer">
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4" />
                   <span className="font-medium">API Testing</span>
                 </div>
                 <span className="text-sm text-muted-foreground">
                   REST and GraphQL endpoint testing with request validation and response verification
+                </span>
+              </Label>
+            </div>
+            {/* Visual Testing */}
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="capability-visual"
+                checked={visualTesting}
+                onCheckedChange={setVisualTesting}
+                data-testid="capability-visual"
+              />
+              <Label htmlFor="capability-visual" className="flex flex-col cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4" />
+                  <span className="font-medium">Visual Testing</span>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  Visual regression and screenshot comparison
                 </span>
               </Label>
             </div>

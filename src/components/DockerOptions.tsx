@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Container, Layers, Settings, GitBranch, Heart } from "lucide-react";
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function AppleSiliconHint() {
   const [isAppleSilicon, setIsAppleSilicon] = useState<boolean | null>(null);
