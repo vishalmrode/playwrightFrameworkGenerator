@@ -84,6 +84,8 @@
 				"$tsc"
 			],
 			"group": "test"
+<<<<<<< HEAD
+=======
 		},
 		{
 			"label": "test:complex",
@@ -114,6 +116,7 @@
 				"$tsc"
 			],
 			"group": "test"
+>>>>>>> development
 		}
 	]
 }
